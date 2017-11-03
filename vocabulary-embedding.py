@@ -18,7 +18,7 @@ lower = False # dont lower case the text
 # # read tokenized headlines and descriptions
 import cPickle as pickle
 FN0 = 'tokens' # this is the name of the data file which I assume you already have
-with open('data/bbc/business.pickle', 'rb') as fp:
+with open('data/bbc/business.pkl', 'rb') as fp:
     heads, desc, keywords = pickle.load(fp) # keywords are not used in this project
 
 
