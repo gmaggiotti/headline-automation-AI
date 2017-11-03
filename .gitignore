@@ -1,0 +1,9 @@
+*.pkl
+*.gz
+*.zip
+*.txt
+*.docs
+*.mtx
+*.terms
+*.TXT
+*.classes

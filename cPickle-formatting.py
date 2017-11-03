@@ -61,7 +61,7 @@ def load_letter(folder):
 def maybe_pickle(data_folders, force=False):
     dataset_names = []
     for folder in data_folders:
-        set_filename = folder + '.pickle'
+        set_filename = folder + '.pkl'
         dataset_names.append(set_filename)
 
         dataset = load_letter(folder)
