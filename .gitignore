@@ -1,3 +1,6 @@
+*.iml
+.idea
+*..hdf5
 *.pkl
 *.gz
 *.zip
