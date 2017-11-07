@@ -11,7 +11,7 @@
 FN = 'vocabulary-embedding'
 seed=42
 vocab_size = 21548
-embedding_dim = 100
+embedding_dim = 300
 lower = False # dont lower case the text
 
 
@@ -60,7 +60,7 @@ def get_idx(vocab, vocabcount):
     word2idx = dict((word, idx+start_idx) for idx,word in enumerate(vocab))
     word2idx['<empty>'] = empty
     word2idx['<eos>'] = eos
-    
+
     idx2word = dict((idx,word) for word,idx in word2idx.iteritems())
 
     return word2idx, idx2word
@@ -73,7 +73,7 @@ word2idx, idx2word = get_idx(vocab, vocabcount)
 # # Word Embedding (Word2Vec)
 # ## read GloVe
 
-glove_name = "data/glove/glove.6B.100d.txt"
+glove_name = "data/glove/glove.6B.300d.txt"
 glove_n_symbols = 400000
 
 
@@ -104,6 +104,8 @@ for w,i in glove_index_dict.iteritems():
 
 
 # ## embedding matrix
+# calculate toke size
+vocab_size =idx2word.__len__()
 
 # use GloVe to initialize embedding matrix
 
@@ -116,7 +118,7 @@ print 'random-embedding/glove scale', scale, 'std', embedding.std()
 
 # copy from glove weights of words that appear in our short vocabulary (idx2word)
 c = 0
-for i in range(idx2word.__len__()):
+for i in range(vocab_size):
     w = idx2word[i]
     g = glove_index_dict.get(w, glove_index_dict.get(w.lower()))
     if g is None and w.startswith('#'): # glove has no hastags (I think...)
@@ -180,7 +182,7 @@ for w,idx in word2idx.iteritems():
             if s < glove_thr:
                 break
             if idx2word[embedding_idx] in word2glove :
-                glove_match.append((w, embedding_idx, s)) 
+                glove_match.append((w, embedding_idx, s))
                 break
             score[embedding_idx] = -1
 glove_match.sort(key = lambda x: -x[2])
