@@ -3,7 +3,7 @@ import numpy as np
 import os
 import io
 
-folder ="data/bbc/"
+folder ="data-es/tn/"
 
 def maybe_extract(folder, force=False):
     root = os.path.splitext(os.path.splitext(folder)[0])[0]  # remove .tar.gz

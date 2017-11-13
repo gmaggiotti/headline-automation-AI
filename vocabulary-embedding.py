@@ -18,7 +18,7 @@ lower = False # dont lower case the text
 # # read tokenized headlines and descriptions
 import cPickle as pickle
 FN0 = 'tokens' # this is the name of the data file which I assume you already have
-with open('data/bbc/business.pkl', 'rb') as fp:
+with open('data-es/tn/sports.pkl', 'rb') as fp:
     heads, desc, keywords = pickle.load(fp) # keywords are not used in this project
 
 
@@ -73,8 +73,8 @@ word2idx, idx2word = get_idx(vocab, vocabcount)
 # # Word Embedding (Word2Vec)
 # ## read GloVe
 
-glove_name = "data/glove/glove.6B.300d.txt"
-glove_n_symbols = 400000
+glove_name = "data-es/glove/SBW-vectors-300-min5.txt"
+glove_n_symbols = 1000654
 
 
 #   get glove word2vec into an array
@@ -98,8 +98,8 @@ glove_embedding_weights.std()
 
 # lower tokens
 for w,i in glove_index_dict.iteritems():
-    w = w.lower()
-    if w not in glove_index_dict:
+    w1 = w.lower()
+    if w1 not in glove_index_dict:
         glove_index_dict[w] = i
 
 
@@ -201,11 +201,11 @@ X = [[word2idx[token] for token in d.split()] for d in desc]
 
 
 import cPickle as pickle
-with open('data/%s.pkl'%FN,'wb') as fp:
+with open('data-es/%s.pkl'%FN,'wb') as fp:
     pickle.dump((embedding, idx2word, word2idx, glove_idx2idx),fp,-1)
 
 
 import cPickle as pickle
-with open('data/%s.data.pkl'%FN,'wb') as fp:
+with open('data-es/%s.data.pkl'%FN,'wb') as fp:
     pickle.dump((X,Y),fp,-1)
 

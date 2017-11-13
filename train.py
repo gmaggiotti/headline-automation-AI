@@ -74,11 +74,11 @@ nb_val_samples = 500
 # # read word embedding
 import cPickle as pickle
 
-with open('data/%s.pkl'%FN0, 'rb') as fp:
+with open('data-es/%s.pkl'%FN0, 'rb') as fp:
     embedding, idx2word, word2idx, glove_idx2idx = pickle.load(fp)
 vocab_size, embedding_size = embedding.shape
 
-with open('data/%s.data.pkl'%FN0, 'rb') as fp:
+with open('data-es/%s.data.pkl'%FN0, 'rb') as fp:
     X, Y = pickle.load(fp)
 
 
@@ -294,8 +294,8 @@ inspect_model(model)
 
 # # Load
 
-if FN1 and os.path.exists('data/%s.hdf5'%FN1):
-    model.load_weights('data/%s.hdf5'%FN1)
+if FN1 and os.path.exists('data-es/%s.hdf5'%FN1):
+    model.load_weights('data-es/%s.hdf5'%FN1)
 
 
 # # Test
@@ -484,9 +484,7 @@ import sys
 import Levenshtein
 
 def gensamples(skips=2, k=10, batch_size=batch_size, short=True, temperature=1., use_unk=True):
-    i = random.randint(0,len(
-
-        X_test)-1)
+    i = random.randint(0,len(X_test)-1)
     print 'HEAD:',' '.join(idx2word[w] for w in Y_test[i][:maxlenh])
     print 'DESC:',' '.join(idx2word[w] for w in X_test[i][:maxlend])
     sys.stdout.flush()
@@ -661,44 +659,22 @@ def test_gen(gen, n=5):
             prt('D',x)
 
 
-# In[53]:
-
 
 test_gen(gen(X_train, Y_train, batch_size=batch_size))
-
-
-# test fliping
-
-# In[54]:
-
-
 test_gen(gen(X_train, Y_train, nflips=6, model=model, debug=False, batch_size=batch_size))
-
-
-# In[55]:
-
-
 valgen = gen(X_test, Y_test,nb_batches=3, batch_size=batch_size)
 
 
-# check that valgen repeats itself after nb_batches
-
-# In[56]:
 
 
 for i in range(4):
     test_gen(valgen, n=1)
 
 
-# # Train
-
-# In[57]:
 
 
 history = {}
 
-
-# In[58]:
 
 
 traingen = gen(X_train, Y_train, batch_size=batch_size, nflips=nflips, model=model)
@@ -722,8 +698,8 @@ for iteration in range(500):
                            )
     for k,v in h.history.iteritems():
         history[k] = history.get(k,[]) + v
-    with open('data/%s.history.pkl'%FN,'wb') as fp:
+    with open('data-es/%s.history.pkl'%FN,'wb') as fp:
         pickle.dump(history,fp,-1)
-    model.save_weights('data/%s.hdf5'%FN, overwrite=True)
+    model.save_weights('data-es/%s.hdf5'%FN, overwrite=True)
     gensamples(batch_size=batch_size)
 

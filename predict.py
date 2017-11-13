@@ -63,7 +63,7 @@ FN1 = 'train'
 
 
 maxlend=50 # 0 - if we dont want to use description at all
-maxlenh=25
+maxlenh=20
 maxlen = maxlend + maxlenh
 rnn_size = 512
 rnn_layers = 3  # match FN1
@@ -88,32 +88,22 @@ optimizer = 'adam'
 batch_size=64
 
 
-# In[9]:
-
-
 nb_train_samples = 30000
 nb_val_samples = 3000
 
 
 # # read word embedding
 
-# In[10]:
-
-
 import cPickle as pickle
 
-with open('data/%s.pkl'%FN0, 'rb') as fp:
+with open('data-es/%s.pkl'%FN0, 'rb') as fp:
     embedding, idx2word, word2idx, glove_idx2idx = pickle.load(fp)
 vocab_size, embedding_size = embedding.shape
 
 
-# In[11]:
-
 
 nb_unknown_words = 10
 
-
-# In[12]:
 
 
 print 'dimension of embedding space for words',embedding_size
@@ -123,21 +113,14 @@ print 'number of words outside vocabulary which we can substitue using glove sim
 print 'number of words that will be regarded as unknonw(unk)/out-of-vocabulary(oov)',len(idx2word)-vocab_size-len(glove_idx2idx)
 
 
-# In[13]:
 
 
 for i in range(nb_unknown_words):
     idx2word[vocab_size-1-i] = '<%d>'%i
 
 
-# In[14]:
-
-
 for i in range(vocab_size-nb_unknown_words, len(idx2word)):
     idx2word[i] = idx2word[i]+'^'
-
-
-# In[15]:
 
 
 empty = 0
@@ -146,7 +129,6 @@ idx2word[empty] = '_'
 idx2word[eos] = '~'
 
 
-# In[16]:
 
 
 import numpy as np
@@ -154,8 +136,6 @@ from keras.preprocessing import sequence
 from keras.utils import np_utils
 import random, sys
 
-
-# In[17]:
 
 
 def prt(label, x):
@@ -181,7 +161,6 @@ from keras.layers.core import Lambda
 import keras.backend as K
 
 
-# In[19]:
 
 
 # seed weight initialization
@@ -189,17 +168,12 @@ random.seed(seed)
 np.random.seed(seed)
 
 
-# In[20]:
-
-
 regularizer = l2(weight_decay) if weight_decay else None
 
 
 # ## rnn model
-
 # start with a stacked LSTM, which is identical to the bottom of the model used in training
 
-# In[21]:
 
 
 rnn_model = Sequential()
@@ -274,13 +248,9 @@ def load_weights(model, filepath):
     return weight_values
 
 
-# In[23]:
 
+weights = load_weights(rnn_model, 'data-es/%s.hdf5'%FN1)
 
-weights = load_weights(rnn_model, 'data/%s.hdf5'%FN1)
-
-
-# In[24]:
 
 
 [w.shape for w in weights]
@@ -489,7 +459,7 @@ def beamsearch(predict, start=[empty]*maxlend + [eos], avoid=None, avoid_score=1
         # find the best (lowest) scores we have from all possible dead samples and
         # all live samples and all possible new words added
         scores = dead_scores + live_scores
-        ranks = sample(scores, k)
+        ranks = sample(scores, k,temperature=temperature)
         n = len(dead_scores)
         dead_scores = [dead_scores[r] for r in ranks if r < n]
         dead_samples = [dead_samples[r] for r in ranks if r < n]
@@ -634,281 +604,53 @@ def gensamples(X=None, X_test=None, Y_test=None, avoid=None, avoid_score=1, skip
     return samples
 
 
-# In[58]:
+# seed = 8
+# random.seed(seed)
+# np.random.seed(seed)
 
 
-seed = 8
-random.seed(seed)
-np.random.seed(seed)
+X = "Lionel Messi ya empezó a jugar el Mundial de Rusia 2018. Y empezó a jugar fuerte. A pocas horas del amistoso contra la Selección que será anfitriona del evento más importante del fútbol, sorprendió con una frase en donde bancó a Gonzalo Higuaín y casi que reclamó una nueva oportunidad en la Selección argentina para el delantero de la Juventus.  Se ensañaron mal con él, la gente y parte del periodismo. Me encantaría que el Pipa vuelva a tener otra oportunidad en la Selección. Sigue haciendo goles en la Juventus, dijo Messi con total convencimiento en una entrevista con Fox Sports."
 
+X1='Parece que Jorge Sampaoli ya no tiene dudas. De no mediar inconvenientes, en su cabeza ya tiene a los 11 titulares que saldrán a la cancha a enfrentar a Rusia en su primer amistoso como técnico de la Selección argentina.'
 
-# In[59]:
-
-
-X = "* Billy Joel is looking for a buyer in Sagaponack^ . Now that he and wife Katie Lee Joel are splitting up , the singer is planning to sell the two oceanfront^ properties he bought for her in 2007 . The four-bedroom mansion ( No . 1 ) and smaller beach bungalow^ ( No . 2 ) will be listed with Corcoran 's Biana^ Stepanian^ for a combined $ 35 million . * Richard Bressler^ , the former CFO of Viacom and now a managing"
-Y = "Billy Joel Lists in Sagaponack^"
-
-
-# In[60]:
+X2= "En una semana, se desmoronó el buen presente de River. El Millonario quedó eliminado de la Copa Libertadores en manos de Lanús y días más tarde cayó en el Superclásico ante Boca, lo que lo dejó fuera de la lucha por la Superliga. Sin embargo, aún queda un desafío: ganar la Copa Argentina.  Este domingo, River se medirá ante Deportivo Morón en Mendoza por un lugar en la final de la competencia federal y Marcelo Gallardo empieza a definir el posible equipo.  Una de las grandes dudas está en el puesto de arquero. Germán Lux no viene mostrando un gran nivel y su actuación en la derrota frente al Xeneize lo dejó en el ojo de la tormenta. Por lo que reflejan las encuestas, los fanáticos del club de Núñez piden una chance para el tercer arquero, Enrique Bologna.  Sin embargo, la idea del cuerpo técnico es respaldar al arquero titular. De esta manera, todo indica que Germán Lux seguirá formando parte de la formación inicial de un River que todavía sueña con cerrar el año levantando la Copa Argentina."
 
 
 samples = gensamples(X=X, skips=2, batch_size=batch_size, k=10, temperature=1.)
-
-
-# In[61]:
-
-
-X = "18 Cake GIFs That 'll Make You Moist"
-Y = "Is it 350degF^ in here or is it just me ?"
-
-
-# In[62]:
+str = ' '.join(idx2word[w] for w in samples)
+print "RESULT:" + str
 
 
 samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1.)
-
-
-# In[50]:
-
-
-X = "President Barack Obama 's re-election campaign is fundraising off of comments on Obama 's birth certificate by Mitt Romney 's son Matt ."
-
-
-# In[63]:
-
+str = ' '.join(idx2word[w] for w in samples)
+print "RESULT:" + str
 
 gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1, use_unk=True, short=False);
-
-
-# In[64]:
-
-
-X = "What have you been listening to this year ? If you want to find out using cold , hard evidence , then Spotify 's new Year in Music tool will tell you ."
-Y = "Spotify Will Make You Smarter for Your App"
-
-
-# In[65]:
-
+str = ' '.join(idx2word[w] for w in samples)
+print "RESULT:" + str
 
 samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1)
-
-
-# In[66]:
-
-
-headline = samples[0][0][len(samples[0][1]):]
-
-
-# In[67]:
-
-
-' '.join(idx2word[w] for w in headline)
-
-
-# In[68]:
+str = ' '.join(idx2word[w] for w in samples)
+print "RESULT:" + str
 
 
 avoid = headline
 
 
-# In[69]:
-
 
 samples = gensamples(X, avoid=avoid, avoid_score=.1, skips=2, batch_size=batch_size, k=10, temperature=1.)
 
 
-# In[70]:
 
 
 avoid = samples[0][0][len(samples[0][1]):]
 
 
-# In[71]:
-
 
 samples = gensamples(X, avoid=avoid, avoid_score=.1, skips=2, batch_size=batch_size, k=10, temperature=1.)
 
 
-# In[72]:
-
 
 len(samples)
 
-
-# # Weights
-
-# In[73]:
-
-
-def wsimple_context(X, mask, n=activation_rnn_size, maxlend=maxlend, maxlenh=maxlenh):
-    desc, head = X[:,:maxlend], X[:,maxlend:]
-    head_activations, head_words = head[:,:,:n], head[:,:,n:]
-    desc_activations, desc_words = desc[:,:,:n], desc[:,:,n:]
-    
-    # RTFM http://deeplearning.net/software/theano/library/tensor/basic.html#theano.tensor.batched_tensordot
-    # activation for every head word and every desc word
-    activation_energies = K.batch_dot(head_activations, desc_activations, axes=([2],[2]))
-    # make sure we dont use description words that are masked out
-    assert mask.ndim == 2
-    activation_energies = K.switch(mask[:, None, :maxlend], activation_energies, -1e20)
-    
-    # for every head word compute weights for every desc word
-    activation_energies = K.reshape(activation_energies,(-1,maxlend))
-    activation_weights = K.softmax(activation_energies)
-    activation_weights = K.reshape(activation_weights,(-1,maxlenh,maxlend))
-
-    return activation_weights
-
-
-class WSimpleContext(Lambda):
-    def __init__(self):
-        super(WSimpleContext, self).__init__(wsimple_context)
-        self.supports_masking = True
-
-    def compute_mask(self, input, input_mask=None):
-        return input_mask[:, maxlend:]
-    
-    def get_output_shape_for(self, input_shape):
-        nb_samples = input_shape[0]
-        n = 2*(rnn_size - activation_rnn_size)
-        return (nb_samples, maxlenh, n)
-
-
-# In[74]:
-
-
-wmodel = Sequential()
-wmodel.add(rnn_model)
-
-
-# In[75]:
-
-
-wmodel.add(WSimpleContext())
-
-
-# In[76]:
-
-
-wmodel.compile(loss='categorical_crossentropy', optimizer=optimizer)
-
-
-# ## test
-
-# In[77]:
-
-
-seed = 8
-random.seed(seed)
-np.random.seed(seed)
-
-
-# In[78]:
-
-
-context_weight.set_value(np.float32(1.))
-head_weight.set_value(np.float32(1.))
-
-
-# In[79]:
-
-
-X = "Representatives of the groups depicted in The Revenant^ spoke with BuzzFeed News about the actor 's Golden Globes speech calling on listeners to `` protect ... indigenous lands . ''"
-Y = "Native American Groups Officially Respond To Leonardo DiCaprio 's Call To Action"
-
-
-# In[80]:
-
-
-samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1.)
-
-
-# In[81]:
-
-
-sample = samples[0][0]
-
-
-# In[82]:
-
-
-' '.join([idx2word[w] for w in sample])
-
-
-# In[83]:
-
-
-data = sequence.pad_sequences([sample], maxlen=maxlen, value=empty, padding='post', truncating='post')
-data.shape
-
-
-# In[84]:
-
-
-weights = wmodel.predict(data, verbose=0, batch_size=1)
-weights.shape
-
-
-# In[85]:
-
-
-startd = np.where(data[0,:] != empty)[0][0]
-lenh = np.where(data[0,maxlend+1:] == eos)[0][0]
-startd, lenh
-
-
-# In[86]:
-
-
-import matplotlib.pyplot as plt
-get_ipython().magic(u'matplotlib inline')
-plt.hist(np.array(weights[0,:lenh,startd:].flatten()+1), bins=100);
-
-
-# In[87]:
-
-
-import numpy as np
-from IPython.core.display import display, HTML
-
-def heat(sample,weights,dark=0.3):
-    weights = (weights - weights.min())/(weights.max() - weights.min() + 1e-4)
-    html = ''
-    fmt = ' <span style="background-color: #{0:x}{0:x}ff">{1}</span>'
-    for t,w in zip(sample,weights):
-        c = int(256*((1.-dark)*(1.-w)+dark))
-        html += fmt.format(c,idx2word[t])
-    display(HTML(html))
-
-
-# In[88]:
-
-
-heat(sample, weights[0,-1])
-
-
-# In[89]:
-
-
-import pandas as pd
-import seaborn as sns
-
-
-# In[90]:
-
-
-columns = [idx2word[data[0,i]] for i in range(startd,maxlend)]
-rows = [idx2word[data[0,i]] for i in range(maxlend+1,maxlend+lenh+1)]
-
-
-# In[91]:
-
-
-df = pd.DataFrame(weights[0,:lenh,startd:],columns=columns,index=rows)
-
-
-# In[92]:
-
-
-sns.heatmap(df);
 
