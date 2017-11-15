@@ -66,7 +66,7 @@ p_W, p_U, p_dense, p_emb, weight_decay = 0, 0, 0, 0, 0
 optimizer = 'adam'
 LR = 1e-4
 batch_size=64
-nflips=10
+nflips=50   # puse %50 de flips
 nb_train_samples = 30000
 nb_val_samples = 500
 
@@ -178,15 +178,10 @@ random.seed(seed)
 np.random.seed(seed)
 
 
-# In[27]:
+# The model
 
 
 regularizer = l2(weight_decay) if weight_decay else None
-
-
-# start with a standard stacked LSTM
-
-# In[28]:
 
 
 model = Sequential()

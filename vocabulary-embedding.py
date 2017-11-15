@@ -11,14 +11,14 @@
 FN = 'vocabulary-embedding'
 seed=42
 vocab_size = 21548
-embedding_dim = 300
+embedding_dim = 100
 lower = False # dont lower case the text
 
 
 # # read tokenized headlines and descriptions
 import cPickle as pickle
 FN0 = 'tokens' # this is the name of the data file which I assume you already have
-with open('data-es/tn/sports.pkl', 'rb') as fp:
+with open('data-es/tn/sports-6k.pkl', 'rb') as fp:
     heads, desc, keywords = pickle.load(fp) # keywords are not used in this project
 
 
@@ -73,7 +73,7 @@ word2idx, idx2word = get_idx(vocab, vocabcount)
 # # Word Embedding (Word2Vec)
 # ## read GloVe
 
-glove_name = "data-es/glove/SBW-vectors-300-min5.txt"
+glove_name = "data-es/glove/SBW-vectors-100-500k.txt"
 glove_n_symbols = 1000654
 
 

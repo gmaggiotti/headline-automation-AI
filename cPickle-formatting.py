@@ -3,15 +3,10 @@ import numpy as np
 import os
 import io
 
-folder ="data-es/tn/"
+folder ="data-es/tn/sports-6k"
 
 def maybe_extract(folder, force=False):
     root = os.path.splitext(os.path.splitext(folder)[0])[0]  # remove .tar.gz
-    if os.path.isdir(root) and not force:
-        # You may override by setting force=True.
-        print('%s already present - Skipping extraction of %s.' % (root, folder))
-    else:
-        print('Extracting data for %s. This may take a while. Please wait.' % root)
     data_folders = [
         os.path.join(root, d) for d in sorted(os.listdir(root))
         if os.path.isdir(os.path.join(root, d))]
@@ -73,7 +68,7 @@ def maybe_pickle(data_folders, force=False):
 
     return dataset_names
 
-datasets = maybe_pickle(dataset_folders)
+datasets = maybe_pickle([folder])
 
 
 #######################

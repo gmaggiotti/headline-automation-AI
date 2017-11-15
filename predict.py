@@ -63,7 +63,7 @@ FN1 = 'train'
 
 
 maxlend=50 # 0 - if we dont want to use description at all
-maxlenh=20
+maxlenh=20      # probar poner en cero y no usar header
 maxlen = maxlend + maxlenh
 rnn_size = 512
 rnn_layers = 3  # match FN1
@@ -459,7 +459,7 @@ def beamsearch(predict, start=[empty]*maxlend + [eos], avoid=None, avoid_score=1
         # find the best (lowest) scores we have from all possible dead samples and
         # all live samples and all possible new words added
         scores = dead_scores + live_scores
-        ranks = sample(scores, k,temperature=temperature)
+        ranks = sample(scores, k)
         n = len(dead_scores)
         dead_scores = [dead_scores[r] for r in ranks if r < n]
         dead_samples = [dead_samples[r] for r in ranks if r < n]
@@ -611,26 +611,26 @@ def gensamples(X=None, X_test=None, Y_test=None, avoid=None, avoid_score=1, skip
 
 X = "Lionel Messi ya empezó a jugar el Mundial de Rusia 2018. Y empezó a jugar fuerte. A pocas horas del amistoso contra la Selección que será anfitriona del evento más importante del fútbol, sorprendió con una frase en donde bancó a Gonzalo Higuaín y casi que reclamó una nueva oportunidad en la Selección argentina para el delantero de la Juventus.  Se ensañaron mal con él, la gente y parte del periodismo. Me encantaría que el Pipa vuelva a tener otra oportunidad en la Selección. Sigue haciendo goles en la Juventus, dijo Messi con total convencimiento en una entrevista con Fox Sports."
 
-X1='Parece que Jorge Sampaoli ya no tiene dudas. De no mediar inconvenientes, en su cabeza ya tiene a los 11 titulares que saldrán a la cancha a enfrentar a Rusia en su primer amistoso como técnico de la Selección argentina.'
+X1='Cuando tenía 14 o 15 años y había perdido el interés en jugar al fútbol, comencé a estudiar y a jugar el ajedrez. Por cierto, lo hice bastante bien. En dos años me convertí en candidato a maestro, fui campeón de Sochi y me di cuenta de que había empezado a pensar de manera diferente. De repente sentí que los cursos escolares no sirven de nada (…) Por supuesto, se requiere conocimiento básico en todas las áreas. Pero los cursos que ayudan a las personas en la vida real también deben ser presentados. Creo que la lógica es algo que todos necesitan. El ajedrez, por cierto, es un muy buen modelo de juego de lógica. Me parece que la lógica se convirtió en un trampolín para todas mis actividades futuras. La declaración corresponde a una entrevista brindada por Sergei Galitsky, un ciudadano ruso de 50 años que cuando tenía 27 fundó una empresa mediante la cual se convirtió en uno de los empresarios más ricos de su país (ndr: su fortuna se calcula en más de 6 mil millones de dólares) y en un caso de estudio en el mundo. Es, además, dueño del club Krasnodar FC en cuyo estadio jugará hoy la Argentina ante Nigeria en el segundo amistoso de preparación para el Mundial de Rusia 2018.  Sergei Arutyunyan, en rigor de su apellido real, nació en un suburbio de Sochi el 14 de agosto de 1967 y, a diferencia de lo que resulta habitual, tomó el apellido de su mujer, Viktoria Galitskaya, con quien tuvo a su única hija, Polina Galitskaya. Cuentan en su país que el padre de la novia se negaba a que su descendencia adoptara un apellido armenio y por eso insistió en que su futuro yerno adoptara su identidad. Cursó sus estudios en la Universidad Estatal de Kuban, uno de los centros científicos y educativos más grandes del sur de Rusia y ocupa en la actualidad el puesto 202 en el ránking de los máximos millonarios del planeta que realiza la revista Forbes.  Galitsky es un caso de estudio en el mundo. No hizo su fortuna con base en materias primas como podrían ser, en su país, la explotación del petróleo u otros recursos naturales sino a partir de su primera tienda de supermercados y cosméticos llamada Magnit, a la que fundó en 1994, que luego se transformó en una impresionante cadena que hoy emplea a más de 165 mil trabajadores. La insignia de su empresa que hoy es la más grande en el rubro supermercados de Rusia es, casi como una paradoja, Precios siempre bajos.  En 2008, cuando ya era un mecenas, decidió fundar el Krasnodar FC, un club de fútbol que comenzó en la tercera división de Rusia cuando el presidente del país, Vladimir Putin, instó a los empresarios a instalarse en ese deporte, hasta entonces acostumbrado a que sus clubes fuesen sostenidos por las arcas públicas. En apenas cuatro años ascendió a la máxima categoría y en 2014 se clasificó por primera vez a la UEFA Europa League.  A diferencia de los empresarios de su país, que se instalan en Rusia y desde allí operan sus empresas y/o negocios, Galitsky decidió permanecer en Krasnodar para seguir de cerca las instancias deportivas de su equipo. Habita junto a su familia una propiedad donde por fuera de la casa principal hay otras ocho en una de las cuales vive su hija y en otra el entrenador de su equipo de fútbol, Igor Shalimov, que cuenta en su delegación de jugadores con cuatro sudamericanos: el ecuatoriano Cristian Ramírez, el brasileño Wanderson Maciel, el colombiano Ricardo Laborde y el uruguayo Mauricio Pereyra.'
 
-X2= "En una semana, se desmoronó el buen presente de River. El Millonario quedó eliminado de la Copa Libertadores en manos de Lanús y días más tarde cayó en el Superclásico ante Boca, lo que lo dejó fuera de la lucha por la Superliga. Sin embargo, aún queda un desafío: ganar la Copa Argentina.  Este domingo, River se medirá ante Deportivo Morón en Mendoza por un lugar en la final de la competencia federal y Marcelo Gallardo empieza a definir el posible equipo.  Una de las grandes dudas está en el puesto de arquero. Germán Lux no viene mostrando un gran nivel y su actuación en la derrota frente al Xeneize lo dejó en el ojo de la tormenta. Por lo que reflejan las encuestas, los fanáticos del club de Núñez piden una chance para el tercer arquero, Enrique Bologna.  Sin embargo, la idea del cuerpo técnico es respaldar al arquero titular. De esta manera, todo indica que Germán Lux seguirá formando parte de la formación inicial de un River que todavía sueña con cerrar el año levantando la Copa Argentina."
+X2 = "Hasta hace un tiempo, Jorge Sampaoli se planteaba la necesidad de generar química entre Lionel Messi y Paulo Dybala para poder juntarlos en la cancha y formar una sociedad importante para el Mundial de Rusia 2018. Hoy, Dybala es el suplente de Messi y el seleccionador prácticamente no los junta en un mismo partido.  Ante la ausencia de Messi, que volvió a Barcelona por decisión del cuerpo técnico argentino para que descanse, Dybala tendrá una buena oportunidad mañana en el segundo amistoso del seleccionado argentino en Rusia ante Nigeria. Será titular y tendrá la chance de cambiar la imagen que ha dejado con la celeste y blanca."
 
 
-samples = gensamples(X=X, skips=2, batch_size=batch_size, k=10, temperature=1.)
-str = ' '.join(idx2word[w] for w in samples)
+samples = gensamples(X=X1, skips=2, batch_size=batch_size, k=10, temperature=1.)
+str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
 
 samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1.)
-str = ' '.join(idx2word[w] for w in samples)
+str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
 gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1, use_unk=True, short=False);
-str = ' '.join(idx2word[w] for w in samples)
+str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
 samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1)
-str = ' '.join(idx2word[w] for w in samples)
+str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
 
