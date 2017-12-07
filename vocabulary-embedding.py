@@ -76,7 +76,7 @@ word2idx, idx2word = get_idx(vocab, vocabcount)
 glove_name = "data-es/glove/SBW-vectors-100-200k.txt"
 import commands
 cmd_result =commands.getstatusoutput('wc -l '+glove_name)
-glove_n_symbols = cmd_result[1].split()[0]
+glove_n_symbols = int(cmd_result[1].split()[0])
 
 
 #   get glove word2vec into an array
