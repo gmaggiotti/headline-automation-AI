@@ -2,11 +2,11 @@
 # # Word Embedding (Word2Vec)
 # ## read GloVe
 
-glove_name = "data-es/glove/SBW-vectors-300-min5.txt"
+glove_name = "data-es/glove/SBW-vectors-100-200k.txt"
 import commands
 cmd_result =commands.getstatusoutput('wc -l '+glove_name)
 glove_n_symbols = int(cmd_result[1].split()[0])
-embedding_dim = 300
+embedding_dim = 100
 
 #   get glove word2vec into an array
 import numpy as np
@@ -30,7 +30,7 @@ glove_embedding_weights.std()
 reverse_dictionary = dict((idx,word) for word,idx in glove_index_dict.iteritems())
 
 
-word_vec = glove_embedding_weights[glove_index_dict['radio']]
+word_vec = glove_embedding_weights[glove_index_dict['niño']]
 sim = np.dot(word_vec, -glove_embedding_weights.T).argsort()[0:8]
 for idx in range(8):
     print reverse_dictionary[sim[idx]]

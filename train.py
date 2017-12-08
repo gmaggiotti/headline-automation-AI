@@ -1,9 +1,23 @@
+
+# coding: utf-8
+
+# In[1]:
+
+
 FN = 'train'
 
 
 # you should use GPU but if it is busy then you always can fall back to your CPU
+
+# In[2]:
+
+
 import os
 # os.environ['THEANO_FLAGS'] = 'device=cpu,floatX=float32'
+
+
+# In[3]:
+
 
 import keras
 keras.__version__
@@ -57,7 +71,13 @@ batch_norm=False
 
 # the out of the first `activation_rnn_size` nodes from the top LSTM layer will be used for activation and the rest will be used to select predicted word
 
+# In[8]:
+
+
 activation_rnn_size = 40 if maxlend else 0
+
+
+# In[9]:
 
 
 # training parameters
@@ -66,24 +86,42 @@ p_W, p_U, p_dense, p_emb, weight_decay = 0, 0, 0, 0, 0
 optimizer = 'adam'
 LR = 1e-4
 batch_size=64
-nflips=50   # puse %50 de flips
+nflips=10
+
+
+# In[10]:
+
+
 nb_train_samples = 30000
-nb_val_samples = 500
+nb_val_samples = 3000
 
 
 # # read word embedding
+
+# In[11]:
+
+
 import cPickle as pickle
 
-with open('data-es/%s.pkl'%FN0, 'rb') as fp:
+with open('data/%s.pkl'%FN0, 'rb') as fp:
     embedding, idx2word, word2idx, glove_idx2idx = pickle.load(fp)
 vocab_size, embedding_size = embedding.shape
 
-with open('data-es/%s.data.pkl'%FN0, 'rb') as fp:
+
+# In[12]:
+
+
+with open('data/%s.data.pkl'%FN0, 'rb') as fp:
     X, Y = pickle.load(fp)
+
+
+# In[13]:
 
 
 nb_unknown_words = 10
 
+
+# In[14]:
 
 
 print 'number of examples',len(X),len(Y)
@@ -94,18 +132,29 @@ print 'number of words outside vocabulary which we can substitue using glove sim
 print 'number of words that will be regarded as unknonw(unk)/out-of-vocabulary(oov)',len(idx2word)-vocab_size-len(glove_idx2idx)
 
 
+# In[15]:
+
 
 for i in range(nb_unknown_words):
     idx2word[vocab_size-1-i] = '<%d>'%i
 
 
 # when printing mark words outside vocabulary with `^` at their end
+
+# In[16]:
+
+
 oov0 = vocab_size-nb_unknown_words
+
+
+# In[17]:
 
 
 for i in range(oov0, len(idx2word)):
     idx2word[i] = idx2word[i]+'^'
 
+
+# In[18]:
 
 
 from sklearn.cross_validation import train_test_split
@@ -113,8 +162,15 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=nb_val_sampl
 len(X_train), len(Y_train), len(X_test), len(Y_test)
 
 
+# In[19]:
+
+
 del X
 del Y
+
+
+# In[20]:
+
 
 empty = 0
 eos = 1
@@ -122,6 +178,7 @@ idx2word[empty] = '_'
 idx2word[eos] = '~'
 
 
+# In[21]:
 
 
 import numpy as np
@@ -143,7 +200,7 @@ def prt(label, x):
 # In[23]:
 
 
-i = 9
+i = 334
 prt('H',Y_train[i])
 prt('D',X_train[i])
 
@@ -151,7 +208,7 @@ prt('D',X_train[i])
 # In[24]:
 
 
-i = 9
+i = 334
 prt('H',Y_test[i])
 prt('D',X_test[i])
 
@@ -162,8 +219,7 @@ prt('D',X_test[i])
 
 
 from keras.models import Sequential
-from keras.layers.core import Dense, Activation, Dropout, RepeatVector
-from keras.layers import Merge
+from keras.layers.core import Dense, Activation, Dropout, RepeatVector, Merge
 from keras.layers.wrappers import TimeDistributed
 from keras.layers.recurrent import LSTM
 from keras.layers.embeddings import Embedding
@@ -178,10 +234,15 @@ random.seed(seed)
 np.random.seed(seed)
 
 
-# The model
+# In[27]:
 
 
 regularizer = l2(weight_decay) if weight_decay else None
+
+
+# start with a standard stacked LSTM
+
+# In[28]:
 
 
 model = Sequential()
@@ -205,6 +266,7 @@ for i in range(rnn_layers):
 # In this only the last `rnn_size - activation_rnn_size` are used from each output.
 # The first `activation_rnn_size` output is used to computer the weights for the averaging.
 
+# In[29]:
 
 
 from keras.layers.core import Lambda
@@ -219,8 +281,7 @@ def simple_context(X, mask, n=activation_rnn_size, maxlend=maxlend, maxlenh=maxl
     # activation for every head word and every desc word
     activation_energies = K.batch_dot(head_activations, desc_activations, axes=(2,2))
     # make sure we dont use description words that are masked out
-    if mask !=None:
-        activation_energies = activation_energies + -1e20*K.expand_dims(1.-K.cast(mask[:, :maxlend],'float32'),1)
+    activation_energies = activation_energies + -1e20*K.expand_dims(1.-K.cast(mask[:, :maxlend],'float32'),1)
     
     # for every head word compute weights for every desc word
     activation_energies = K.reshape(activation_energies,(-1,maxlend))
@@ -265,10 +326,19 @@ from keras.optimizers import Adam, RMSprop # usually I prefer Adam but article u
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
 
+# In[32]:
+
+
+get_ipython().run_cell_magic(u'javascript', u'', u'// new Audio("http://www.soundjay.com/button/beep-09.wav").play ()')
+
+
+# In[33]:
 
 
 K.set_value(model.optimizer.lr,np.float32(LR))
 
+
+# In[34]:
 
 
 def str_shape(x):
@@ -283,14 +353,19 @@ def inspect_model(model):
         print
 
 
+# In[35]:
+
 
 inspect_model(model)
 
 
 # # Load
 
-if FN1 and os.path.exists('data-es/%s.hdf5'%FN1):
-    model.load_weights('data-es/%s.hdf5'%FN1)
+# In[36]:
+
+
+if FN1 and os.path.exists('data/%s.hdf5'%FN1):
+    model.load_weights('data/%s.hdf5'%FN1)
 
 
 # # Test
@@ -654,22 +729,44 @@ def test_gen(gen, n=5):
             prt('D',x)
 
 
+# In[53]:
+
 
 test_gen(gen(X_train, Y_train, batch_size=batch_size))
+
+
+# test fliping
+
+# In[54]:
+
+
 test_gen(gen(X_train, Y_train, nflips=6, model=model, debug=False, batch_size=batch_size))
+
+
+# In[55]:
+
+
 valgen = gen(X_test, Y_test,nb_batches=3, batch_size=batch_size)
 
 
+# check that valgen repeats itself after nb_batches
+
+# In[56]:
 
 
 for i in range(4):
     test_gen(valgen, n=1)
 
 
+# # Train
+
+# In[57]:
 
 
 history = {}
 
+
+# In[58]:
 
 
 traingen = gen(X_train, Y_train, batch_size=batch_size, nflips=nflips, model=model)
@@ -693,8 +790,8 @@ for iteration in range(500):
                            )
     for k,v in h.history.iteritems():
         history[k] = history.get(k,[]) + v
-    with open('data-es/%s.history.pkl'%FN,'wb') as fp:
+    with open('data/%s.history.pkl'%FN,'wb') as fp:
         pickle.dump(history,fp,-1)
-    model.save_weights('data-es/%s.hdf5'%FN, overwrite=True)
+    model.save_weights('data/%s.hdf5'%FN, overwrite=True)
     gensamples(batch_size=batch_size)
 

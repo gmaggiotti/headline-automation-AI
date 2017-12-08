@@ -1,11 +1,10 @@
-
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 # Generate intial word embedding for headlines and description
 
 # The embedding is limited to a fixed vocabulary size (`vocab_size`) but
 # a vocabulary of all the words that appeared in the data is built.
-
+import re
 
 
 FN = 'vocabulary-embedding'
@@ -28,12 +27,15 @@ if lower:
 if lower:
     desc = [h.lower() for h in desc]
 
+def refine_sentence( sentence ):
+    regex = '[?.,¡!)\\"]'
+    return re.sub(regex," ", sentence).lower()
 
 # # build vocabulary
 from collections import Counter
 from itertools import chain
 def get_vocab(lst):
-    vocabcount = Counter(w for txt in lst for w in txt.split())
+    vocabcount = Counter(w for txt in lst for w in refine_sentence(txt).split())
     vocab = map(lambda x: x[0], sorted(vocabcount.items(), key=lambda x: -x[1]))
     return vocab, vocabcount
 
@@ -198,8 +200,8 @@ for orig, sub, score in glove_match[-10:]:
 
 # build a lookup table of index of outside words to index of inside words
 glove_idx2idx = dict((word2idx[w],embedding_idx) for  w, embedding_idx, _ in glove_match)
-Y = [[word2idx[token] for token in headline.split()] for headline in heads]
-X = [[word2idx[token] for token in d.split()] for d in desc]
+Y = [[word2idx[token] for token in refine_sentence(headline).split()] for headline in heads]
+X = [[word2idx[token] for token in refine_sentence(d).split()] for d in desc]
 
 
 import cPickle as pickle
