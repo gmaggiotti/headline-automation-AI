@@ -29,7 +29,6 @@ if lower:
     desc = [h.lower() for h in desc]
 
 
-
 # # build vocabulary
 from collections import Counter
 from itertools import chain
