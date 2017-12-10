@@ -1,17 +1,8 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
+# -*- coding: utf-8 -*-
 FN = 'predict'
 
 
 # if your GPU is busy you can use CPU for predictions
-
-# In[2]:
-
-
 import os
 os.environ['KERAS_BACKEND'] = 'theano'
 os.environ['THEANO_FLAGS'] = 'device=cpu,floatX=float32,exception_verbosity=high'
@@ -72,13 +63,11 @@ batch_norm=False
 
 # the out of the first `activation_rnn_size` nodes from the top layer will be used for activation and the rest will be used to select predicted word
 
-# In[7]:
 
 
 activation_rnn_size = 40 if maxlend else 0
 
 
-# In[8]:
 
 
 # training parameters
@@ -86,10 +75,6 @@ seed=42
 p_W, p_U, p_dense, p_emb, weight_decay = 0, 0, 0, 0, 0
 optimizer = 'adam'
 batch_size=64
-
-
-nb_train_samples = 30000
-nb_val_samples = 3000
 
 
 # # read word embedding
@@ -264,8 +249,6 @@ weights = load_weights(rnn_model, 'data-es/%s.hdf5'%FN1)
 # In this only the last `rnn_size - activation_rnn_size` are used from each output.
 # The first `activation_rnn_size` output is used to computer the weights for the averaging.
 
-# In[36]:
-
 
 context_weight = K.variable(1.)
 head_weight = K.variable(1.)
@@ -307,8 +290,6 @@ class SimpleContext(Lambda):
         return (nb_samples, maxlenh, n)
 
 
-# In[37]:
-
 
 model = Sequential()
 model.add(rnn_model)
@@ -317,14 +298,10 @@ if activation_rnn_size:
     model.add(SimpleContext(name='simplecontext_1'))
 
 
-# In[38]:
-
 
 # we are not going to fit so we dont care about loss and optimizer
 model.compile(loss='categorical_crossentropy', optimizer='adam')
 
-
-# In[39]:
 
 
 n = 2*(rnn_size - activation_rnn_size)
@@ -332,9 +309,6 @@ n
 
 
 # perform the top dense of the trained model in numpy so we can play around with exactly how it works
-
-# In[40]:
-
 
 # out very own softmax
 def output2probs(output):
@@ -344,8 +318,6 @@ def output2probs(output):
     output /= output.sum()
     return output
 
-
-# In[41]:
 
 
 def output2probs1(output):
@@ -361,9 +333,6 @@ def output2probs1(output):
 
 # # Test
 
-# In[42]:
-
-
 def lpadd(x, maxlend=maxlend, eos=eos):
     """left (pre) pad a description to maxlend and then add eos.
     The eos is the input to predicting the first word in the headline
@@ -378,27 +347,16 @@ def lpadd(x, maxlend=maxlend, eos=eos):
     return [empty]*(maxlend-n) + x + [eos]
 
 
-# In[43]:
 
 
 samples = [lpadd([3]*26)]
 # pad from right (post) so the first maxlend will be description followed by headline
 data = sequence.pad_sequences(samples, maxlen=maxlen, value=empty, padding='post', truncating='post')
-
-
-# In[44]:
-
-
 np.all(data[:,maxlend] == eos)
-
-
-# In[45]:
 
 
 data.shape,map(len, samples)
 
-
-# In[46]:
 
 
 probs = model.predict(data, verbose=0, batch_size=1)
@@ -406,9 +364,6 @@ probs.shape
 
 
 # # Sample generation
-
-# In[47]:
-
 
 # variation to https://github.com/ryankiros/skip-thoughts/blob/master/decoding/search.py
 def beamsearch(predict, start=[empty]*maxlend + [eos], avoid=None, avoid_score=1,
@@ -484,13 +439,6 @@ def beamsearch(predict, start=[empty]*maxlend + [eos], avoid=None, avoid_score=1
     return dead_samples, dead_scores
 
 
-# In[48]:
-
-
-# !pip install python-Levenshtein
-
-
-# In[49]:
 
 
 def keras_rnn_predict(samples, empty=empty, model=model, maxlen=maxlen):
@@ -506,7 +454,7 @@ def keras_rnn_predict(samples, empty=empty, model=model, maxlen=maxlen):
     return np.array([output2probs(prob[sample_length-maxlend-1]) for prob, sample_length in zip(probs, sample_lengths)])
 
 
-# In[50]:
+
 
 
 def vocab_fold(xs):
@@ -523,8 +471,6 @@ def vocab_fold(xs):
     return xs
 
 
-# In[51]:
-
 
 def vocab_unfold(desc,xs):
     # assume desc is the unfolded version of the start of xs
@@ -536,7 +482,6 @@ def vocab_unfold(desc,xs):
     return [unfold.get(x,x) for x in xs]
 
 
-# In[57]:
 
 
 import sys
@@ -608,13 +553,17 @@ def gensamples(X=None, X_test=None, Y_test=None, avoid=None, avoid_score=1, skip
 # random.seed(seed)
 # np.random.seed(seed)
 
+import re
+def refine_sentence( sentence ):
+    spcl_chr = re.escape('[]?.,()!"\'\\/:')
+    regex = '[' + spcl_chr + ']'
+    return re.sub(regex," ", sentence)
 
-X = "Lionel Messi ya empezó a jugar el Mundial de Rusia 2018. Y empezó a jugar fuerte. A pocas horas del amistoso contra la Selección que será anfitriona del evento más importante del fútbol, sorprendió con una frase en donde bancó a Gonzalo Higuaín y casi que reclamó una nueva oportunidad en la Selección argentina para el delantero de la Juventus.  Se ensañaron mal con él, la gente y parte del periodismo. Me encantaría que el Pipa vuelva a tener otra oportunidad en la Selección. Sigue haciendo goles en la Juventus, dijo Messi con total convencimiento en una entrevista con Fox Sports."
+X = u"Superliga: Rosario Central le ganó el clásico a Newell's y la alegría es toda canalla"
 
-X2 = "Hasta hace un tiempo, Jorge Sampaoli se planteaba la necesidad de generar química entre Lionel Messi y Paulo Dybala para poder juntarlos en la cancha y formar una sociedad importante para el Mundial de Rusia 2018. Hoy, Dybala es el suplente de Messi y el seleccionador prácticamente no los junta en un mismo partido.  Ante la ausencia de Messi, que volvió a Barcelona por decisión del cuerpo técnico argentino para que descanse, Dybala tendrá una buena oportunidad mañana en el segundo amistoso del seleccionado argentino en Rusia ante Nigeria. Será titular y tendrá la chance de cambiar la imagen que ha dejado con la celeste y blanca."
+X = refine_sentence(X)
 
-
-samples = gensamples(X=X2, skips=2, batch_size=batch_size, k=10, temperature=1.)
+samples = gensamples(X=X, skips=2, batch_size=batch_size, k=10, temperature=1.)
 str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
@@ -632,7 +581,6 @@ str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
 
-avoid = headline
 
 
 

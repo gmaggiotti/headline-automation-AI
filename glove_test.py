@@ -30,7 +30,7 @@ glove_embedding_weights.std()
 reverse_dictionary = dict((idx,word) for word,idx in glove_index_dict.iteritems())
 
 
-word_vec = glove_embedding_weights[glove_index_dict['niño']]
+word_vec = glove_embedding_weights[glove_index_dict['más']]
 sim = np.dot(word_vec, -glove_embedding_weights.T).argsort()[0:8]
 for idx in range(8):
     print reverse_dictionary[sim[idx]]

@@ -28,8 +28,9 @@ if lower:
     desc = [h.lower() for h in desc]
 
 def refine_sentence( sentence ):
-    regex = '[?.,¡!)\\"]'
-    return re.sub(regex," ", sentence).lower()
+    spcl_chr = re.escape('[]?.,()!"\'\\/:')
+    regex = '[' + spcl_chr + ']'
+    return re.sub(regex," ", sentence)
 
 # # build vocabulary
 from collections import Counter
