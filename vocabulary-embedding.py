@@ -9,15 +9,15 @@ import re
 
 FN = 'vocabulary-embedding'
 seed=42
-vocab_size = 21548
-embedding_dim = 100
+vocab_size = 40000
+embedding_dim = 300
 lower = False # dont lower case the text
 
 
 # # read tokenized headlines and descriptions
 import cPickle as pickle
 FN0 = 'tokens' # this is the name of the data file which I assume you already have
-with open('data-es/tn/sports-1k.pkl', 'rb') as fp:
+with open('data-es/tn/sports-50k.pkl', 'rb') as fp:
     heads, desc, keywords = pickle.load(fp) # keywords are not used in this project
 
 
@@ -27,16 +27,39 @@ if lower:
 if lower:
     desc = [h.lower() for h in desc]
 
-def refine_sentence( sentence ):
-    spcl_chr = re.escape('[]?.,()!"\'\\/:')
-    regex = '[' + spcl_chr + ']'
-    return re.sub(regex," ", sentence)
+import HTMLParser
+def polish_sentence( sentence ):
+    p = HTMLParser.HTMLParser()
+    sentence = p.unescape(unicode(sentence, "utf-8"))
+    sentence = re.sub(u'\n','', sentence)
+    sentence = re.sub(u'<[^>]*>','', sentence)
+    sentence = re.sub(u'\[[a-z\_]*embed:.*\]','', sentence)
+    sentence = re.sub(u'\[video:.*\]','', sentence)
+    sentence = re.sub(u'[\.\[\]\?\,\(\)\!\"\'\\/\:\-]',' ', sentence)
+    sentence = re.sub(u'[ ]+',' ', sentence)
+
+# h = html2text.HTML2Text()
+    # h.ignore_links = True
+    # sentence = h.handle(unicode(sentence, "utf-8"))
+    # del h
+    #
+    # sentence = re.sub('&ntilde;', "ñ",sentence)
+    # sentence = re.sub(u'\n', "",sentence)
+    # sentence = re.sub(u'\[social_embed:.*\]',"",sentence)
+    # sentence = re.sub(u'[a-zA-Z]\.', " . ",sentence)
+    #
+    # spcl_chr = re.escape('[]?,()!"\'\\/:-')
+    # regex = '[' + spcl_chr + ']'
+    # regex_array = ['<[^>]*>',regex]
+    # for i in range(regex_array.__len__()):
+    #     sentence = re.sub(regex_array[i]," ", sentence)
+    return sentence
 
 # # build vocabulary
 from collections import Counter
 from itertools import chain
 def get_vocab(lst):
-    vocabcount = Counter(w for txt in lst for w in refine_sentence(txt).split())
+    vocabcount = Counter(w for txt in lst for w in polish_sentence(txt).split())
     vocab = map(lambda x: x[0], sorted(vocabcount.items(), key=lambda x: -x[1]))
     return vocab, vocabcount
 
@@ -75,7 +98,7 @@ word2idx, idx2word = get_idx(vocab, vocabcount)
 # # Word Embedding (Word2Vec)
 # ## read GloVe
 
-glove_name = "data-es/glove/SBW-vectors-100-200k.txt"
+glove_name = "data-es/glove/SBW-vectors-300-1MM.txt"
 import commands
 cmd_result =commands.getstatusoutput('wc -l '+glove_name)
 glove_n_symbols = int(cmd_result[1].split()[0])
@@ -110,7 +133,7 @@ for w,i in glove_index_dict.iteritems():
 
 # ## embedding matrix
 # calculate toke size
-vocab_size =idx2word.__len__()
+#vocab_size =idx2word.__len__()
 
 # use GloVe to initialize embedding matrix
 
@@ -201,8 +224,8 @@ for orig, sub, score in glove_match[-10:]:
 
 # build a lookup table of index of outside words to index of inside words
 glove_idx2idx = dict((word2idx[w],embedding_idx) for  w, embedding_idx, _ in glove_match)
-Y = [[word2idx[token] for token in refine_sentence(headline).split()] for headline in heads]
-X = [[word2idx[token] for token in refine_sentence(d).split()] for d in desc]
+Y = [[word2idx[token] for token in polish_sentence(headline).split()] for headline in heads]
+X = [[word2idx[token] for token in polish_sentence(d).split()] for d in desc]
 
 
 import cPickle as pickle
