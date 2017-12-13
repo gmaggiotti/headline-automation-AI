@@ -14,4 +14,4 @@ def similarity(word):
     for idx in range(len(sim)):
         print idx2word[sim[idx]]
 
-similarity('roja')
+similarity(u'Millonario')

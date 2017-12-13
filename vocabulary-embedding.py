@@ -10,7 +10,7 @@ import re
 FN = 'vocabulary-embedding'
 seed=42
 vocab_size = 40000
-embedding_dim = 300
+embedding_dim = 100
 lower = False # dont lower case the text
 
 
@@ -98,7 +98,7 @@ word2idx, idx2word = get_idx(vocab, vocabcount)
 # # Word Embedding (Word2Vec)
 # ## read GloVe
 
-glove_name = "data-es/glove/SBW-vectors-300-1MM.txt"
+glove_name = "data-es/glove/SBW-vectors-100-1MM.txt"
 import commands
 cmd_result =commands.getstatusoutput('wc -l '+glove_name)
 glove_n_symbols = int(cmd_result[1].split()[0])
@@ -114,7 +114,7 @@ with open(glove_name, 'r') as fp:
     for l in fp:
         l = l.strip().split()
         w = l[0]
-        glove_index_dict[w] = i
+        glove_index_dict[unicode(w,'utf-8')] = i
         glove_embedding_weights[i,:] = map(float,l[1:])
         i += 1
 
@@ -133,7 +133,7 @@ for w,i in glove_index_dict.iteritems():
 
 # ## embedding matrix
 # calculate toke size
-#vocab_size =idx2word.__len__()
+vocab_size =idx2word.__len__()
 
 # use GloVe to initialize embedding matrix
 

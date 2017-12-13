@@ -68,14 +68,14 @@ activation_rnn_size = 40 if maxlend else 0
 
 
 # training parameters
-seed=4
+seed=42
 p_W, p_U, p_dense, p_emb, weight_decay = 0, 0, 0, 0, 0
 optimizer = 'adam'
 LR = 1e-4
 batch_size=64
 nflips=10
 nb_train_samples = 30000
-nb_val_samples = 500
+nb_val_samples = 3000
 
 
 # # read word embedding
