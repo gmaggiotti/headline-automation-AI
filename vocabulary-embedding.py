@@ -37,22 +37,7 @@ def polish_sentence( sentence ):
     sentence = re.sub(u'\[video:.*\]','', sentence)
     sentence = re.sub(u'[\.\[\]\?\,\(\)\!\"\'\\/\:\-]',' ', sentence)
     sentence = re.sub(u'[ ]+',' ', sentence)
-
-# h = html2text.HTML2Text()
-    # h.ignore_links = True
-    # sentence = h.handle(unicode(sentence, "utf-8"))
-    # del h
-    #
-    # sentence = re.sub('&ntilde;', "ñ",sentence)
-    # sentence = re.sub(u'\n', "",sentence)
-    # sentence = re.sub(u'\[social_embed:.*\]',"",sentence)
-    # sentence = re.sub(u'[a-zA-Z]\.', " . ",sentence)
-    #
-    # spcl_chr = re.escape('[]?,()!"\'\\/:-')
-    # regex = '[' + spcl_chr + ']'
-    # regex_array = ['<[^>]*>',regex]
-    # for i in range(regex_array.__len__()):
-    #     sentence = re.sub(regex_array[i]," ", sentence)
+    sentence = re.sub(u'%[0-9][a-zA-Z-0-9]', ' ',sentence)
     return sentence
 
 # # build vocabulary

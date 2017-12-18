@@ -681,10 +681,10 @@ r[0].shape, r[1].shape, len(r)
 
 
 
-for iteration in range(500):
+for iteration in range(9):
     print 'Iteration', iteration
     h = model.fit_generator(traingen, samples_per_epoch=nb_train_samples,
-                        nb_epoch=9, validation_data=valgen, nb_val_samples=nb_val_samples
+                        nb_epoch=1, validation_data=valgen, nb_val_samples=nb_val_samples
                            )
     for k,v in h.history.iteritems():
         history[k] = history.get(k,[]) + v
