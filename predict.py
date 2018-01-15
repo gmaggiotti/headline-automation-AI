@@ -559,7 +559,7 @@ def refine_sentence( sentence ):
     regex = '[' + spcl_chr + ']'
     return re.sub(regex," ", sentence)
 
-X = u"Superliga: Rosario Central le ganó el clásico a Newell's y la alegría es toda canalla"
+X = u'Boca: Emmanuel Mas firma hoy contrato y se convierte en nuevo refuerzo'
 
 X = refine_sentence(X)
 
@@ -568,35 +568,35 @@ str = ' '.join(idx2word[w] for w in samples[0][1])
 print "RESULT:" + str
 
 
-samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1.)
-str = ' '.join(idx2word[w] for w in samples[0][1])
-print "RESULT:" + str
-
-gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1, use_unk=True, short=False);
-str = ' '.join(idx2word[w] for w in samples[0][1])
-print "RESULT:" + str
-
-samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1)
-str = ' '.join(idx2word[w] for w in samples[0][1])
-print "RESULT:" + str
-
-
-
-
-
-samples = gensamples(X, avoid=avoid, avoid_score=.1, skips=2, batch_size=batch_size, k=10, temperature=1.)
-
-
-
-
-avoid = samples[0][0][len(samples[0][1]):]
-
-
-
-samples = gensamples(X, avoid=avoid, avoid_score=.1, skips=2, batch_size=batch_size, k=10, temperature=1.)
-
-
-
-len(samples)
-
-
+# samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1.)
+# str = ' '.join(idx2word[w] for w in samples[0][1])
+# print "RESULT:" + str
+#
+# gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1, use_unk=True, short=False);
+# str = ' '.join(idx2word[w] for w in samples[0][1])
+# print "RESULT:" + str
+#
+# samples = gensamples(X, skips=2, batch_size=batch_size, k=10, temperature=1)
+# str = ' '.join(idx2word[w] for w in samples[0][1])
+# print "RESULT:" + str
+#
+#
+#
+#
+#
+# samples = gensamples(X, avoid=avoid, avoid_score=.1, skips=2, batch_size=batch_size, k=10, temperature=1.)
+#
+#
+#
+#
+# avoid = samples[0][0][len(samples[0][1]):]
+#
+#
+#
+# samples = gensamples(X, avoid=avoid, avoid_score=.1, skips=2, batch_size=batch_size, k=10, temperature=1.)
+#
+#
+#
+# len(samples)
+#
+#
