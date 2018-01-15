@@ -3,8 +3,8 @@ This project is intended for automating the creation of article headlines using 
 
 Spanish Billion Words word2vec Embeddings linguistic resource: http://cs.famaf.unc.edu.ar/~ccardellino/SBWCE/SBW-vectors-300-min5.bin.gz
 
+### *Article: https://goo.gl/r19kut*
 
-###Example: 
+### *Results:* 
 ![1-seq2seq](results.png)
 
-Article: https://goo.gl/r19kut
