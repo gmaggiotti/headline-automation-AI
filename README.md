@@ -8,3 +8,4 @@ Spanish Billion Words word2vec Embeddings linguistic resource: http://cs.famaf.u
 ### *Results:* 
 ![1-seq2seq](results.png)
 
+PD: A-> human made;  B -> machine
