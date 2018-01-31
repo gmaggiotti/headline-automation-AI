@@ -24,7 +24,7 @@ keras.__version__
 # In[4]:
 
 
-FN0 = 'vocabulary-embedding'
+FN0 = 'vocabulary-embedding50k-dropline'
 
 
 # we will generate predictions using the model generated in this notebook
@@ -32,7 +32,7 @@ FN0 = 'vocabulary-embedding'
 # In[5]:
 
 
-FN1 = 'train'
+FN1 = 'train50k-dropline'
 
 
 # input data (`X`) is made from `maxlend` description words followed by `eos`
@@ -553,15 +553,30 @@ def gensamples(X=None, X_test=None, Y_test=None, avoid=None, avoid_score=1, skip
 # random.seed(seed)
 # np.random.seed(seed)
 
+import HTMLParser
+def polish_sentence( sentence ):
+    p = HTMLParser.HTMLParser()
+    sentence = p.unescape(sentence)
+    sentence = re.sub(u'\n','', sentence)
+    sentence = re.sub(u'<[^>]*>nt','', sentence)
+    sentence = re.sub(u'<[^>]*>','', sentence)
+    sentence = re.sub(u'\[[a-z\_]*embed:.*\]','', sentence)
+    sentence = re.sub(u'\[video:.*\]','', sentence)
+    sentence = re.sub(u'[\.\[\]\?\,\(\)\!\"\'\\/\:\-]',' ', sentence)
+    sentence = re.sub(u'[ ]+',' ', sentence)
+    sentence = re.sub(u'%[0-9][a-zA-Z-0-9]', ' ',sentence)
+    return sentence
+
 import re
 def refine_sentence( sentence ):
     spcl_chr = re.escape('[]?.,()!"\'\\/:')
     regex = '[' + spcl_chr + ']'
     return re.sub(regex," ", sentence)
 
-X = u'Boca: Emmanuel Mas firma hoy contrato y se convierte en nuevo refuerzo'
+X = u'Nahitan Nández ya tuvo la bendición de la Bombonera. Después de su gol contra Colón de Santa Fe el sábado por la noche la rompió'
 
-X = refine_sentence(X)
+
+X = polish_sentence(X)
 
 samples = gensamples(X=X, skips=2, batch_size=batch_size, k=10, temperature=1.)
 str = ' '.join(idx2word[w] for w in samples[0][1])

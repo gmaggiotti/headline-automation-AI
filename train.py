@@ -22,7 +22,7 @@ keras.__version__
 # Use the index of outside words to replace them with several `oov` words (`oov` , `oov0`, `oov1`, ...) that appear in the same description and headline. This will allow headline generator to replace the oov with the same word in the description
 
 
-FN0 = 'vocabulary-embedding'
+FN0 = 'vocabulary-embedding6k-dropline'
 
 
 # implement the "simple" model from http://arxiv.org/pdf/1512.01712v1.pdf
