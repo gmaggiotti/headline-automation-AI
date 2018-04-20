@@ -3,7 +3,7 @@ import numpy as np
 import os
 import io
 
-folder ="data-es/tn/sports50k-dropline"
+folder ="data-es/tn/sports50k-telam"
 
 def maybe_extract(folder, force=False):
     root = os.path.splitext(os.path.splitext(folder)[0])[0]  # remove .tar.gz

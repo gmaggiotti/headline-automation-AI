@@ -7,7 +7,7 @@
 import re
 
 
-FN = 'vocabulary-embedding50k-dropline'
+FN = 'vocabulary-embedding50k-telam'
 seed=42
 vocab_size = 40000
 embedding_dim = 100
@@ -17,7 +17,7 @@ lower = False # dont lower case the text
 # # read tokenized headlines and descriptions
 import cPickle as pickle
 FN0 = 'tokens' # this is the name of the data file which I assume you already have
-with open('data-es/tn/sports50k-dropline.pkl', 'rb') as fp:
+with open('data-es/tn/sports50k-telam.pkl', 'rb') as fp:
     heads, desc, keywords = pickle.load(fp) # keywords are not used in this project
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-FN = 'train'
+FN = 'train50k-telam'
 
 
 # you should use GPU but if it is busy then you always can fall back to your CPU
@@ -22,7 +22,7 @@ keras.__version__
 # Use the index of outside words to replace them with several `oov` words (`oov` , `oov0`, `oov1`, ...) that appear in the same description and headline. This will allow headline generator to replace the oov with the same word in the description
 
 
-FN0 = 'vocabulary-embedding6k-dropline'
+FN0 = 'vocabulary-embedding50k-telam'
 
 
 # implement the "simple" model from http://arxiv.org/pdf/1512.01712v1.pdf
@@ -33,7 +33,7 @@ FN0 = 'vocabulary-embedding6k-dropline'
 
 
 
-FN1 = 'train'
+FN1 = 'train50k-telam'
 
 
 # input data (`X`) is made from `maxlend` description words followed by `eos`
@@ -51,7 +51,7 @@ FN1 = 'train'
 
 
 
-maxlend=25 # 0 - if we dont want to use description at all
+maxlend=60 # 0 - if we dont want to use description at all
 maxlenh=25
 maxlen = maxlend + maxlenh
 rnn_size = 512 # must be same as 160330-word-gen
@@ -72,7 +72,7 @@ seed=42
 p_W, p_U, p_dense, p_emb, weight_decay = 0, 0, 0, 0, 0
 optimizer = 'adam'
 LR = 1e-4
-batch_size=64
+batch_size=128
 nflips=10
 nb_train_samples = 30000
 nb_val_samples = 3000

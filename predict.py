@@ -24,7 +24,7 @@ keras.__version__
 # In[4]:
 
 
-FN0 = 'vocabulary-embedding50k-dropline'
+FN0 = 'vocabulary-embedding50k-telam'
 
 
 # we will generate predictions using the model generated in this notebook
@@ -32,7 +32,7 @@ FN0 = 'vocabulary-embedding50k-dropline'
 # In[5]:
 
 
-FN1 = 'train50k-dropline'
+FN1 = 'train50-telam'
 
 
 # input data (`X`) is made from `maxlend` description words followed by `eos`
@@ -53,8 +53,8 @@ FN1 = 'train50k-dropline'
 # In[6]:
 
 
-maxlend=50 # 0 - if we dont want to use description at all
-maxlenh=20      # probar poner en cero y no usar header
+maxlend=60 # 0 - if we dont want to use description at all
+maxlenh=25      # probar poner en cero y no usar header
 maxlen = maxlend + maxlenh
 rnn_size = 512
 rnn_layers = 3  # match FN1
@@ -74,7 +74,7 @@ activation_rnn_size = 40 if maxlend else 0
 seed=42
 p_W, p_U, p_dense, p_emb, weight_decay = 0, 0, 0, 0, 0
 optimizer = 'adam'
-batch_size=64
+batch_size=128
 
 
 # # read word embedding
@@ -573,7 +573,7 @@ def refine_sentence( sentence ):
     regex = '[' + spcl_chr + ']'
     return re.sub(regex," ", sentence)
 
-X = u'Nahitan Nández ya tuvo la bendición de la Bombonera. Después de su gol contra Colón de Santa Fe el sábado por la noche la rompió'
+X = u'Boca Juniors le ganó a San Lorenzo por 3 a 2 y si mañana vuelve a ganar se consagrará campeón de la Liga Argentina femenina de clubes de vóleibol 2018.'
 
 
 X = polish_sentence(X)
