@@ -137,7 +137,6 @@ def prt(label, x):
 
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Dropout, RepeatVector
-from keras.layers import Merge
 from keras.layers.wrappers import TimeDistributed
 from keras.layers.recurrent import LSTM
 from keras.layers.embeddings import Embedding
@@ -488,22 +487,13 @@ import sys
 import Levenshtein
 
 def gensamples(X=None, X_test=None, Y_test=None, avoid=None, avoid_score=1, skips=2, k=10, batch_size=batch_size, short=True, temperature=1., use_unk=True):
-    if X is None or isinstance(X,int):
-        if X is None:
-            i = random.randint(0,len(X_test)-1)
-        else:
-            i = X
-        print 'HEAD %d:'%i,' '.join(idx2word[w] for w in Y_test[i])
-        print 'DESC:',' '.join(idx2word[w] for w in X_test[i])
-        sys.stdout.flush()
-        x = X_test[i]
-    else:
-         x =[]
-         for w in X.split():
-            try:
-                x.append(word2idx[w.rstrip('^')] )
-            except KeyError:
-                print('KeyError: ' + w.rstrip('^'))
+
+    x =[]
+    for w in X.split():
+        try:
+            x.append(word2idx[w.rstrip('^')] )
+        except KeyError:
+            print('KeyError: ' + w.rstrip('^'))
 
     if avoid:
         # avoid is a list of avoids. Each avoid is a string or list of word indeicies
